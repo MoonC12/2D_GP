@@ -24,33 +24,19 @@ class Map:
     def draw(self):
         self.image.draw(400, 300)
 
-
-#class Boy:
-    #def __init__(self):
-        #self.x, self.y = 0, 90
-        #self.frame = 0
-        #self.image = load_image('run_animation.png')
-        #self.dir = 1
-
-    #def update(self):
-        #self.frame = (self.frame + 1) % 8
-        #self.x += self.dir
-        #if self.x >= 800:
-            #self.dir = -1
-        #elif self.x <= 0:
-            #self.dir = 1
-
-    #def draw(self):
-        #self.image.clip_draw(self.frame * 100, 0, 100, 100, self.x, self.y)
-
-class Character:
+class Monster:
     image = None
+    monster_dir = random.randint(0, 1)    #0 -> left  1 -> right
+    LEFT_RUN, RIGHT_RUN, DROP_RIGHT, DROP_LEFT, SPAWN= 0, 1, 0, 1, 4
 
-    LEFT_RUN, RIGHT_RUN, DROP_RIGHT, DROP_LEFT= 0, 1, 2, 3
+    def handle_spawn(self):
+        if self.monster_dir == 0:
+            self.state = self.DROP_LEFT
+        if self.monster_dir == 1:
+            self.state = self.DROP_RIGHT
 
     def handle_left_run(self):
-        self.x -= 5
-        self.run_frames += 1
+
         if self.x > 60 and self.x < 240:
             if self.x < 60:
                 self.state = self.RIGHT_RUN
@@ -59,7 +45,8 @@ class Character:
             if self.x < 240:
                 self.state = self.DROP_LEFT
                 self.x = 240
-        if self.x > 560 and self.x < 740:
+        if self.y == 425:
+            self.x -= 5
             if self.x < 560:
                 self.state = self.DROP_LEFT
                 self.x = 560
@@ -67,7 +54,6 @@ class Character:
 
     def handle_right_run(self):
         self.x += 5
-        self.run_frames +=1
         if self.x > 60 and self.x < 240:
             if self.x > 240:
                 self.state = self.DROP_RIGHT
@@ -76,72 +62,93 @@ class Character:
             if self.x > 560:
                 self.state = self.DROP_RIGHT
                 self.x = 560
-        if self.x > 560 and self.x < 740:
+        if self.y == 425:
+            self.x += 5
             if self.x > 740:
                 self.state = self.LEFT_RUN
                 self.x = 740
 
     def handle_drop_right(self):
         self.y -= 5
-        self.run_frames +=1
-        if self.y > 425:
-            if self.y < 425:
+        if self.y == 425:
+            self.state = self.RIGHT_RUN
+            self.y = 425
+        if self.y < 425 and self.y > 300:
+            if self.y < 300:
                 self.state = self.RIGHT_RUN
-                self.y = 425
-        
+                self.y = 300
+        if self.y < 300 and self.y > 180:
+            if self.y < 180:
+                self.state = self.RIGHT_RUN
+                self.y = 180
+        if self.y < 180 and self.y > 60:
+            if self.y < 60:
+                self.state = self.RIGHT_RUN
+                self.y = 60
+        if self.y < 60:
+            if self.y < 0:
+                self.state = self.SPAWN
+                self.monster_dir = random.randint(0, 1)
+                self.x, self.y = 400, 600
 
-
+    def handle_drop_left(self):
+        self.y -= 5
+        if self.y == 425:
+            self.state = self.LEFT_RUN
+            self.y = 425
+        if self.y < 425 and self.y > 300:
+            if self.y < 300:
+                self.state = self.LEFT_RUN
+                self.y = 300
+        if self.y < 300 and self.y > 180:
+            if self.y < 180:
+                self.state = self.LEFT_RUN
+                self.y = 180
+        if self.y < 180 and self.y > 60:
+            if self.y < 60:
+                self.state = self.LEFT_RUN
+                self.y = 60
+        if self.y < 60:
+            if self.y < 0:
+                self.state = self.SPAWN
+                self.monster_dir = random.randint(0, 1)
+                self.x, self.y = 400, 600
 
 
     handle_state = {
                 LEFT_RUN:   handle_left_run,
-                RIGHT_RUN:  handle_right_run
+                RIGHT_RUN:  handle_right_run,
+                DROP_RIGHT: handle_drop_right,
+                DROP_LEFT:  handle_drop_left,
+                SPAWN:  handle_spawn
     }
 
+    def update(self):
+        self.frame = (self.frame + 1) % 12
+        self.handle_state[self.state](self)
 
     def __init__(self):
-        self.x, self.y = 60, 60
+        self.x, self.y = 400, 600
         self.frame = 0
-        self.dir = 1
-        self.state = self.RIGHT_RUN
-        if Character.image == None:
-            Character.image = load_image('Monster.png')
-
-    def update(self):
-        #if self.state == self.DROP:
-            #self.frame = (self.frame + 1) % 12
-            #self.y -= (self.dir * 5)
-        if self.state == self.RIGHT_RUN:
-            self.frame = (self.frame + 1) % 12
-            self.x += (self.dir * 5)
-        elif self.state == self.LEFT_RUN:
-            self.frame = (self.frame + 1) % 12
-            self.x += (self.dir * 5)
-
-        if self.x > 240:
-            self.dir = -1
-            self.x = 240
-            self.state = self.LEFT_RUN
-        elif self.x < 60:
-            self.dir = 1
-            self.x = 60
-            self.state = self.RIGHT_RUN
+        self.state = self.SPAWN
+        if Monster.image == None:
+            Monster.image = load_image('Monster.png')
 
     def draw(self):
         self.image.clip_draw(self.frame * 50, self.state * 60, 45, 50, self.x, self.y)
 
 
 def enter():
-    global map01, character#, boy
+    global map01, monster#, boy
     #boy = Boy()
-    character = Character()
+    monster = Monster()
     map01 = Map()
 
 
 def exit():
-    global map01, character#, boy
+    global map01, monster#, boy
     #del(boy)
-    del(character)
+    del(monster)
     del(map01)
 
 
@@ -164,14 +171,14 @@ def handle_events():
 
 def update():
     #boy.update()
-    character.update()
+    monster.update()
 
 
 def draw():
     clear_canvas()
     map01.draw()
     #boy.draw()
-    character.draw()
+    monster.draw()
     update_canvas()
     delay(0.05)
 
