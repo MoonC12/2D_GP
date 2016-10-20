@@ -27,7 +27,7 @@ class Map:
 class Monster:
     image = None
     monster_dir = random.randint(0, 1)    #0 -> left  1 -> right
-    LEFT_RUN, RIGHT_RUN, DROP_RIGHT, DROP_LEFT, SPAWN= 0, 1, 0, 1, 4
+    LEFT_RUN, RIGHT_RUN, DROP_LEFT, DROP_RIGHT, SPAWN= 0, 1, 2, 3, 4
 
     def handle_spawn(self):
         if self.monster_dir == 0:
@@ -36,55 +36,48 @@ class Monster:
             self.state = self.DROP_RIGHT
 
     def handle_left_run(self):
-
-        if self.x > 60 and self.x < 240:
+        self.x -= 5
+        if self.y == 300 or self.y == 60:
             if self.x < 60:
                 self.state = self.RIGHT_RUN
                 self.x = 60
-        if self.x > 240 and self.x < 560:
-            if self.x < 240:
+            if self.x > 400 and self.x < 540:
                 self.state = self.DROP_LEFT
-                self.x = 240
-        if self.y == 425:
-            self.x -= 5
-            if self.x < 560:
+                self.x = 540
+        if self.y == 425 or self.y == 180:
+            if self.x < 220:
                 self.state = self.DROP_LEFT
-                self.x = 560
+                self.x = 220
 
 
     def handle_right_run(self):
         self.x += 5
-        if self.x > 60 and self.x < 240:
-            if self.x > 240:
+        if self.y == 300 or self.y == 60:
+            if self.x < 400 and self.x > 270:
                 self.state = self.DROP_RIGHT
-                self.x = 240
-        if self.x > 240 and self.x < 560:
-            if self.x > 560:
-                self.state = self.DROP_RIGHT
-                self.x = 560
-        if self.y == 425:
-            self.x += 5
+                self.x = 270
             if self.x > 740:
                 self.state = self.LEFT_RUN
                 self.x = 740
+        if self.y == 425 or self.y == 180:
+            if self.x > 590:
+                self.state = self.DROP_RIGHT
+                self.x = 590
 
     def handle_drop_right(self):
         self.y -= 5
         if self.y == 425:
             self.state = self.RIGHT_RUN
             self.y = 425
-        if self.y < 425 and self.y > 300:
-            if self.y < 300:
-                self.state = self.RIGHT_RUN
-                self.y = 300
-        if self.y < 300 and self.y > 180:
-            if self.y < 180:
-                self.state = self.RIGHT_RUN
-                self.y = 180
-        if self.y < 180 and self.y > 60:
-            if self.y < 60:
-                self.state = self.RIGHT_RUN
-                self.y = 60
+        if self.y == 300:
+            self.state = self.RIGHT_RUN
+            self.y = 300
+        if self.y == 180:
+            self.state = self.RIGHT_RUN
+            self.y = 180
+        if self.y == 60:
+            self.state = self.RIGHT_RUN
+            self.y = 60
         if self.y < 60:
             if self.y < 0:
                 self.state = self.SPAWN
@@ -96,18 +89,15 @@ class Monster:
         if self.y == 425:
             self.state = self.LEFT_RUN
             self.y = 425
-        if self.y < 425 and self.y > 300:
-            if self.y < 300:
+        if self.y == 300:
                 self.state = self.LEFT_RUN
                 self.y = 300
-        if self.y < 300 and self.y > 180:
-            if self.y < 180:
-                self.state = self.LEFT_RUN
-                self.y = 180
-        if self.y < 180 and self.y > 60:
-            if self.y < 60:
-                self.state = self.LEFT_RUN
-                self.y = 60
+        if self.y == 180:
+            self.state = self.LEFT_RUN
+            self.y = 180
+        if self.y == 60:
+            self.state = self.LEFT_RUN
+            self.y = 60
         if self.y < 60:
             if self.y < 0:
                 self.state = self.SPAWN
